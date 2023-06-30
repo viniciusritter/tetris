@@ -50,8 +50,15 @@ document.addEventListener('DOMContentLoaded', () => {
       [1,width+1,width*2+1,width*3+1],
       [width,width+1,width+2,width+3]
     ]
+
+    const bombTetromino = [
+      [1,1,1,1],
+      [1,1,1,1],
+      [1,1,1,1],
+      [1,1,1,1],
+    ]
   
-    const theTetrominoes = [lTetromino, zTetromino, tTetromino, oTetromino, iTetromino]
+    const theTetrominoes = [lTetromino, zTetromino, tTetromino, oTetromino, iTetromino, bombTetromino]
   
     let currentPosition = 4
     let currentRotation = 0
@@ -89,10 +96,23 @@ document.addEventListener('DOMContentLoaded', () => {
         moveRight()
       } else if (e.keyCode === 40) {
         moveDown()
+      } else if (e.keyCode === 32) {
+        dropToTheEnd()
       }
     }
     document.addEventListener('keyup', control)
   
+    //move to the last available spot
+
+    function dropToTheEnd() {
+      undraw()
+      while(!current.some(index => squares[currentPosition + index + width].classList.contains('taken'))) {
+        currentPosition += width
+      }
+      draw()
+      freeze()
+    }
+    
     //move down function
     function moveDown() {
       undraw()
