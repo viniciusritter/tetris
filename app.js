@@ -8,12 +8,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let timerId
     let score = 0
     let flag = false
+    let interval
     const colors = [
       'orange',
       'red',
       'purple',
       'green',
-      'blue'
+      'blue',
+      'black',
+      'pink',
+      'brown'
     ]
   
     //The Tetrominoes
@@ -23,12 +27,27 @@ document.addEventListener('DOMContentLoaded', () => {
       [1, width+1, width*2+1, width*2],
       [width, width*2, width*2+1, width*2+2]
     ]
+
+    const invertedLTetromino = [
+      [1, width+1, width*2+1, 0],
+      [width+2, width*2, width*2+1, width*2+2],
+      [1, width+1, width*2+1, width*2+2],
+      [width, width+1, width+2, width*2]
+      
+    ]
   
     const zTetromino = [
       [0,width,width+1,width*2+1],
       [width+1, width+2,width*2,width*2+1],
       [0,width,width+1,width*2+1],
       [width+1, width+2,width*2,width*2+1]
+    ]
+
+    const invertedZTetromino = [
+      [1, width+1, width, width*2],
+      [width, width+1, width*2+1, width*2+2],
+      [1, width+1, width, width*2],
+      [width, width+1, width*2+1, width*2+2]
     ]
   
     const tTetromino = [
@@ -59,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
       [1,1,1,1],
     ]
   
-    const theTetrominoes = [lTetromino, zTetromino, tTetromino, oTetromino, iTetromino, bombTetromino]
+    const theTetrominoes = [lTetromino, zTetromino, tTetromino, oTetromino, iTetromino, bombTetromino, invertedZTetromino, invertedLTetromino]
   
     let currentPosition = 4
     let currentRotation = 0
@@ -134,8 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
           current === theTetrominoes[5][3]
         ) {
           flag = true
-          
-          }
+        }
         
         //start a new tetromino falling
         random = nextRandom
@@ -226,7 +244,10 @@ document.addEventListener('DOMContentLoaded', () => {
       [1, displayWidth, displayWidth+1, displayWidth+2], //tTetromino
       [0, 1, displayWidth, displayWidth+1], //oTetromino
       [1, displayWidth+1, displayWidth*2+1, displayWidth*3+1], //iTetromino
-      [1, 1, 1 , 1] // bombTetromino
+      [1, 1, 1 , 1], // bombTetromino
+      [1, displayWidth+1, displayWidth, displayWidth*2], //invertedZ
+      [1, displayWidth+1, displayWidth*2+1, 0] //invertedL
+      
     ]
   
     //display the shape in the mini-grid display
@@ -241,6 +262,13 @@ document.addEventListener('DOMContentLoaded', () => {
         displaySquares[displayIndex + index].style.backgroundColor = colors[nextRandom]
       })
     }
+
+    function makeInterval () {
+      if (score < 650) {
+        interval = score * 1.2
+      }
+      return interval
+    }
   
     //add functionality to the button
     startBtn.addEventListener('click', () => {
@@ -249,7 +277,22 @@ document.addEventListener('DOMContentLoaded', () => {
         timerId = null
       } else {
         draw()
-        timerId = setInterval(moveDown, 1000 - (score * 1.2))
+        //timerId = setInterval(moveDown, 1000 - makeInterval())
+        if(score < 100){
+          timerId = setInterval(moveDown, 1000);
+        } else if (score < 200) {
+          timerId = setInterval(moveDown, 900)
+        } else if (score > 200 && score < 300) {
+          timerId = setInterval(moveDown, 800)
+        } else if (score > 300 && score < 400) {
+          timerId = setInterval(moveDown, 500)
+        } else if (score > 400 && score < 500) {
+          timerId = setInterval(moveDown, 400)
+        } else  if(score > 500 && score < 600) {
+          timerId = setInterval(moveDown, 300)
+        } else {
+          timerId = setInterval(moveDown, 200)
+        }
         nextRandom = Math.floor(Math.random()*theTetrominoes.length)
         displayShape()
       }
@@ -257,19 +300,13 @@ document.addEventListener('DOMContentLoaded', () => {
   
     //add score
     function addScore() {
+      
       for (let i = 0; i < 199; i +=width) {
         const row = [i, i+1, i+2, i+3, i+4, i+5, i+6, i+7, i+8, i+9]
 
-        if(flag === true) {
-          row.forEach(index => squares[index].classList.add('taken'))
-          flag = false;
-        }
-        console.log(row)
-        console.log(current)
-        console.log(squares)
         if(row.every(index => squares[index].classList.contains('taken')) || flag === true) {
           if(flag === true) {
-            score += 0.1
+            score += 2
           } else {
             score +=10
           }
