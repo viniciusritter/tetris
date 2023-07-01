@@ -119,6 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
         moveDown()
       } else if (e.keyCode === 32) {
         dropToTheEnd()
+      } else if (e.keyCode === 13) {
+        makeInterval()
       }
     }
     document.addEventListener('keyup', control)
@@ -154,7 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ) {
           flag = true
         }
-        
         //start a new tetromino falling
         random = nextRandom
         nextRandom = Math.floor(Math.random() * theTetrominoes.length)
@@ -190,7 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
       draw()
     }
   
-    
     ///FIX ROTATION OF TETROMINOS A THE EDGE 
     function isAtRight() {
       return current.some(index=> (currentPosition + index + 1) % width === 0)  
@@ -227,9 +227,6 @@ document.addEventListener('DOMContentLoaded', () => {
       checkRotatedPosition()
       draw()
     }
-    /////////
-  
-    
     
     //show up-next tetromino in mini-grid display
     const displaySquares = document.querySelectorAll('.mini-grid div')
@@ -264,11 +261,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function makeInterval () {
-      if (score < 650) {
-        interval = score * 1.2
+      if (timerId) {
+        clearInterval(timerId)
+        timerId = null
       }
-      return interval
-    }
+        if(score < 100){
+          timerId = setInterval(moveDown, 1000);
+        } else if (score > 100 && score < 200) {
+          timerId = setInterval(moveDown, 700)
+        } else if (score > 200 && score < 400) {
+          timerId = setInterval(moveDown, 500)
+        } else if (score > 400 && score < 500) {
+          timerId = setInterval(moveDown, 300)
+        } else if(score > 500) {
+          timerId = setInterval(moveDown, 200)
+        }
+     }
   
     //add functionality to the button
     startBtn.addEventListener('click', () => {
@@ -277,22 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
         timerId = null
       } else {
         draw()
-        //timerId = setInterval(moveDown, 1000 - makeInterval())
-        if(score < 100){
-          timerId = setInterval(moveDown, 1000);
-        } else if (score < 200) {
-          timerId = setInterval(moveDown, 900)
-        } else if (score > 200 && score < 300) {
-          timerId = setInterval(moveDown, 800)
-        } else if (score > 300 && score < 400) {
-          timerId = setInterval(moveDown, 500)
-        } else if (score > 400 && score < 500) {
-          timerId = setInterval(moveDown, 400)
-        } else  if(score > 500 && score < 600) {
-          timerId = setInterval(moveDown, 300)
-        } else {
-          timerId = setInterval(moveDown, 200)
-        }
+        makeInterval()
         nextRandom = Math.floor(Math.random()*theTetrominoes.length)
         displayShape()
       }
